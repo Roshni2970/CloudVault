@@ -21,6 +21,7 @@ Fully Containerized: Zero local dependencies required on the host beyond Docker 
 
 
 🛠️ **Tech Stack**
+
 Frontend: HTML, CSS, JavaScript
 
 Backend: Python, Flask
