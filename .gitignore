@@ -1,0 +1,6 @@
+.env
+backups/*
+rclone/*
+!rclone/.gitkeep
+__pycache__/
+*.pyc

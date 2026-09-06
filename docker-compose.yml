@@ -1,0 +1,68 @@
+services:
+
+  db:
+    image: postgres:16-alpine
+    container_name: app_db
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+    restart: unless-stopped
+
+
+  backend:
+    build: ./backend
+    container_name: cloudvault_backend
+
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+      - "5000:5000"
+
+    volumes:
+      - ./backups:/backups
+
+    depends_on:
+      - db
+
+    restart: unless-stopped
+
+
+  backup_worker:
+    build: ./backup
+    container_name: backup_worker
+
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+      # 300 seconds = 5 minutes
+      BACKUP_INTERVAL: 300
+
+      # Leave empty for local-only mode.
+      # Example later: gdrive:CloudVault
+      RCLONE_REMOTE: ""
+
+    volumes:
+      - ./backups:/local_backups
+      - ./rclone:/root/.config/rclone
+
+    depends_on:
+      - db
+
+    restart: unless-stopped
+
+
+volumes:
+  db_data:

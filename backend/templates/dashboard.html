@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>CloudVault Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ☁
+            </div>
+
+            <div>
+                <h2>CloudVault</h2>
+                <span>Backup & Recovery</span>
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <a class="nav-item active"
+               href="#dashboard">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a class="nav-item"
+               href="#backups">
+                <span>◴</span>
+                Backups
+            </a>
+
+            <a class="nav-item"
+               href="#restore">
+                <span>↻</span>
+                Restore
+            </a>
+
+            <a class="nav-item"
+               href="#demo">
+                <span>▣</span>
+                Data Demo
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="storage-box">
+
+                <div class="storage-title">
+                    <span>☁ Cloud Storage</span>
+                    <span id="cloudStatus">Local</span>
+                </div>
+
+                <div class="storage-bar">
+                    <div></div>
+                </div>
+
+                <small>
+                    Rclone integration ready
+                </small>
+
+            </div>
+
+            <div class="version">
+                CloudVault v1.0
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+
+                <p class="eyebrow">
+                    BACKUP MANAGEMENT
+                </p>
+
+                <h1>
+                    Cloud Backup & Recovery
+                </h1>
+
+                <p class="subtitle">
+                    Protect your application data with automated
+                    Docker-based backups.
+                </p>
+
+            </div>
+
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                <span>
+                    System Online
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- STATS -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ◉
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Database
+                    </span>
+
+                    <strong id="databaseStatus">
+                        Checking...
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ◴
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Total Backups
+                    </span>
+
+                    <strong id="backupCount">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ☁
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Storage
+                    </span>
+
+                    <strong id="storageUsed">
+                        0 KB
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ✓
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Last Backup
+                    </span>
+
+                    <strong id="lastBackup">
+                        None
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ACTION CARD -->
+
+        <section class="hero-card">
+
+            <div>
+
+                <span class="hero-tag">
+                    AUTOMATED PROTECTION
+                </span>
+
+                <h2>
+                    Create a secure backup
+                </h2>
+
+                <p>
+                    PostgreSQL data will be exported,
+                    compressed and stored safely.
+                </p>
+
+            </div>
+
+
+            <button class="primary-btn"
+                    onclick="createBackup()">
+
+                <span>＋</span>
+                Backup Now
+
+            </button>
+
+        </section>
+
+
+        <!-- RECENT BACKUPS -->
+
+        <section class="content-section"
+                 id="backups">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Recent Backups
+                    </h2>
+
+                    <p>
+                        Your latest database backup snapshots.
+                    </p>
+
+                </div>
+
+                <button class="secondary-btn"
+                        onclick="loadBackups()">
+
+                    Refresh
+
+                </button>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>Backup</th>
+                        <th>Size</th>
+                        <th>Created</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody id="backupTable">
+
+                    <tr>
+
+                        <td colspan="5"
+                            class="empty">
+
+                            Loading backups...
+
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- RESTORE -->
+
+        <section class="restore-card"
+                 id="restore">
+
+            <div class="restore-icon">
+                ↻
+            </div>
+
+            <div>
+
+                <h2>
+                    Disaster Recovery
+                </h2>
+
+                <p>
+                    Select a backup from the list above
+                    to restore your PostgreSQL database.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- DEMO DATA -->
+
+        <section class="content-section"
+                 id="demo">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Database Demo
+                    </h2>
+
+                    <p>
+                        Use this to demonstrate backup and recovery.
+                    </p>
+
+                </div>
+
+                <div class="demo-actions">
+
+                    <button class="secondary-btn"
+                            onclick="addDemoData()">
+
+                        Add Data
+
+                    </button>
+
+                    <button class="danger-btn"
+                            onclick="deleteDemoData()">
+
+                        Simulate Data Loss
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="demo-table">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Created</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody id="demoTable">
+
+                    <tr>
+
+                        <td colspan="4"
+                            class="empty">
+
+                            No demo data
+
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+
+            <span>
+                CloudVault
+            </span>
+
+            <span>
+                Docker-Based Cloud Backup & Disaster Recovery
+            </span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+
+<div id="toast"
+     class="toast">
+</div>
+
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>
